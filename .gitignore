@@ -3,6 +3,15 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# Model checkpoints (large binary files — store in checkpoints/ folder)
+*.pt
+*.pth
+# Allow the placeholder so the folder is tracked
+!checkpoints/.gitkeep
+
+# Precomputed patch embeddings (auto-generated, too large for git)
+data/patch_embeddings/
+
 # C extensions
 *.so
 
