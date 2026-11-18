@@ -23,7 +23,7 @@ def extract_text_tokens(model, tokens):
 
 def extract_patch_tokens(model, images):
     """
-    Extracts patch token embeddings from OpenAI CLIP ViT-B/32 visual encoder.
+    Extracts patch token embeddings from the CLIP ViT-B/32 visual encoder.
     Args:
         model: Loaded CLIP model
         images: Preprocessed image tensor [B, 3, 224, 224]
@@ -51,12 +51,7 @@ def extract_patch_tokens(model, images):
     return x
 
 class CrossAttentionReranker(nn.Module):
-    """
-    Two-stage Cross-Attention Reranker:
-    Queries: Text tokens [B, 77, 512]
-    Keys/Values: Image patch tokens [B, 50, 512]
-    Outputs: Scalar matching score per (query, image) pair.
-    """
+ 
     def __init__(self, embed_dim=512, num_heads=8, hidden_dim=128, dropout=0.1):
         super().__init__()
         self.cross_attn = nn.MultiheadAttention(
@@ -81,24 +76,4 @@ class CrossAttentionReranker(nn.Module):
         x = self.norm(t + attn_out)
         pooled = x.mean(dim=1)
         score = self.mlp(pooled).squeeze(-1)
-        return score
-
-class GlobalMLPReranker(nn.Module):
-    """Ablation baseline: MLP operating only on concatenated global embeddings."""
-    def __init__(self, embed_dim=512, hidden_dim=256, dropout=0.1):
-        super().__init__()
-        self.mlp = nn.Sequential(
-            nn.Linear(embed_dim * 3, hidden_dim),
-            nn.GELU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden_dim, 64),
-            nn.GELU(),
-            nn.Linear(64, 1)
-        )
-
-    def forward(self, global_text_embed, global_img_embed):
-        t_norm = F.normalize(global_text_embed.float(), dim=-1)
-        v_norm = F.normalize(global_img_embed.float(), dim=-1)
-        feat = torch.cat([t_norm, v_norm, t_norm * v_norm], dim=-1)
-        score = self.mlp(feat).squeeze(-1)
         return score
