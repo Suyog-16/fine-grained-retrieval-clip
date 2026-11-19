@@ -105,7 +105,7 @@ python scripts/precompute_embeddings.py --data_dir data
 
 1. **CLIP misses fine-grained details** — it's great at broad concepts but collapses the whole image into one vector, losing spatial info like sleeve length or collar style.
 2. **Reranker only sees Top-50** — if the correct dress isn't in CLIP's Top-50, the reranker never sees it. Stage 1 quality sets the ceiling.
-3. **Score blending matters** — using only the reranker score risks underfitting on a small training set. Blending with CLIP's score keeps results stable.
+3. **Score blending matters** — using only the reranker score risks overfitting on a small training set. Blending with CLIP's score keeps results stable.
 
 ---
 
